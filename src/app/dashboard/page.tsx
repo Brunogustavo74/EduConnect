@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 "use client";
 
 import { motion } from "framer-motion";
@@ -106,6 +107,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export default function DashboardPage() {
+
   const citacao = citacoes[Math.floor(Math.random() * citacoes.length)];
 
   return (

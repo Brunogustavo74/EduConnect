@@ -74,11 +74,11 @@ export interface EventoAgenda {
 
 export const usuarioAtual = {
   id: "1",
-  nome: "Ana Silva",
-  email: "ana.silva@escola.edu.br",
+  nome: "Bruno Gustavo",
+  email: "bruno.gustavo@nave.org.br",
   avatar: "",
-  serie: "2º ano • Ensino Médio",
-  escola: "Colégio São Paulo",
+  serie: "2º C ano • Ensino Médio",
+  escola: "ETE Cícero Días",
 };
 
 export const proximasAtividades: Atividade[] = [

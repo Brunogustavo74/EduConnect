@@ -26,6 +26,8 @@ export const metadata: Metadata = {
     "escola",
     "alunos",
     "professores",
+    "portal cd",
+    "portal cicero dias",
   ],
 };
 
