@@ -985,7 +985,7 @@ export default function LandingPage() {
               },
               {
                 title: "Empresa",
-                links: ["Sobre nós", "Blog", "Carreiras", "Imprensa", "Contato"],
+                links: ["Sobre nós", "Blog", "Imprensa", "Contato"],
               },
               {
                 title: "Suporte",

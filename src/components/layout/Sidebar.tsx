@@ -33,7 +33,6 @@ const navItems = [
   { label: "Monitoria", href: "/dashboard/monitoria", icon: Users },
   { label: "Resumos", href: "/dashboard/resumos", icon: FileText },
   { label: "Caderno", href: "/dashboard/caderno", icon: PenTool },
-  { label: "Carreiras", href: "/dashboard/carreiras", icon: Compass },
   { label: "Comunidade", href: "/dashboard/comunidade", icon: MessageCircle },
   { label: "Materiais", href: "/dashboard/materiais", icon: FolderOpen },
 ];
