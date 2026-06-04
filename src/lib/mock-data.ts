@@ -1,76 +1,31 @@
-export interface Atividade {
-  id: string;
-  titulo: string;
-  disciplina: string;
-  tipo: "prova" | "trabalho" | "atividade" | "evento";
-  data: string;
-  horario?: string;
-  descricao?: string;
-  concluida?: boolean;
-}
+import type {
+  Atividade,
+  Disciplina,
+  Monitor,
+  Material,
+  Nota,
+  DesempenhoMensal,
+  MetaSemanal,
+  EventoAgenda,
+  Notificacao,
+  Conquista,
+  Citacao,
+  Carreira,
+  DashboardStats,
+  Usuario,
+} from "@/types";
 
-export interface Disciplina {
-  id: string;
-  nome: string;
-  professor: string;
-  cor: string;
-  media: number;
-  notas: number[];
-}
-
-export interface Monitor {
-  id: string;
-  nome: string;
-  avatar: string;
-  disciplina: string;
-  avaliacao: number;
-  disponivel: boolean;
-  descricao: string;
-}
-
-export interface Material {
-  id: string;
-  titulo: string;
-  disciplina: string;
-  tipo: "pdf" | "resumo" | "flashcard" | "video";
-  autor: string;
-  data: string;
-  downloads: number;
-}
-
-export interface Nota {
-  id: string;
-  disciplina: string;
-  titulo: string;
-  conteudo: string;
-  data: string;
-  compartilhada: boolean;
-}
-
-export interface DesempenhoMensal {
-  mes: string;
-  nota: number;
-}
-
-export interface MetaSemanal {
-  id: string;
-  titulo: string;
-  concluida: boolean;
-  horasEstudo: number;
-  horasMeta: number;
-}
-
-export interface EventoAgenda {
-  id: string;
-  titulo: string;
-  tipo: "prova" | "trabalho" | "evento" | "atividade";
-  horario: string;
-  local?: string;
-  disciplina?: string;
-  dia: number;
-  mes: number;
-  ano: number;
-}
+// Re-export types for backward compatibility
+export type {
+  Atividade,
+  Disciplina,
+  Monitor,
+  Material,
+  Nota,
+  DesempenhoMensal,
+  MetaSemanal,
+  EventoAgenda,
+};
 
 export const usuarioAtual = {
   id: "1",

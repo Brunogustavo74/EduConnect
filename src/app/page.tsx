@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import {
   GraduationCap,
   ClipboardList,
@@ -31,9 +31,56 @@ import {
   Sparkles,
   Quote,
 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+
+const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={props.className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+const Twitter = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={props.className}
+  >
+    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+  </svg>
+);
+
+const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={props.className}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
 
  
 const fadeUp = {
@@ -109,10 +156,10 @@ const features = [
 ];
 
 const stats = [
-  { value: "x", label: "Disciplinas cobertas" },
-  { value: "x%", label: "Satisfação dos alunos" },
-  { value: "x★", label: "Avaliação média" },
-  { value: "x", label: "Disponível sempre" },
+  { value: "24+", label: "Disciplinas integradas" },
+  { value: "98%", label: "Satisfação dos alunos" },
+  { value: "4.9★", label: "Avaliação média" },
+  { value: "1.2k+", label: "Estudantes ativos" },
 ];
 
 const testimonials = [
@@ -197,6 +244,7 @@ export default function LandingPage() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-white overflow-hidden">
@@ -232,9 +280,59 @@ export default function LandingPage() {
                 Começar grátis
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-100 transition-colors focus:outline-none"
+                aria-label="Abrir menu"
+              >
+                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md overflow-hidden"
+            >
+              <div className="px-4 pt-2 pb-6 space-y-3">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block px-3 py-2 rounded-lg text-base font-medium text-gray-600 hover:text-navy hover:bg-gray-50 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+                <div className="pt-4 border-t border-gray-100 flex flex-col gap-3 px-3">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex justify-center items-center text-base font-medium text-navy py-2 hover:text-navy/70 transition-colors"
+                  >
+                    Entrar
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="btn btn-gold text-base py-3 flex items-center justify-center gap-2 group shadow-md"
+                  >
+                    Começar grátis
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       
@@ -965,13 +1063,20 @@ export default function LandingPage() {
                 Conectando alunos, conhecimento e oportunidades para um futuro melhor.
               </p>
               <div className="flex gap-3">
-                {["Instagram", "Twitter", "LinkedIn"].map((social) => (
+                {[
+                  { name: "Instagram", icon: Instagram, href: "https://instagram.com" },
+                  { name: "Twitter", icon: Twitter, href: "https://twitter.com" },
+                  { name: "LinkedIn", icon: Linkedin, href: "https://linkedin.com" },
+                ].map(({ name, icon: Icon, href }) => (
                   <a
-                    key={social}
-                    href="#"
+                    key={name}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
+                    aria-label={name}
                   >
-                    <Globe className="w-3.5 h-3.5 text-white/60" />
+                    <Icon className="w-3.5 h-3.5 text-white/60" />
                   </a>
                 ))}
               </div>
@@ -981,25 +1086,43 @@ export default function LandingPage() {
             {[
               {
                 title: "Plataforma",
-                links: ["Início", "Agenda", "Desempenho", "Monitoria", "Resumos", "Comunidade"],
+                links: [
+                  { name: "Início", href: "/" },
+                  { name: "Agenda", href: "/dashboard/agenda" },
+                  { name: "Desempenho", href: "/dashboard/desempenho" },
+                  { name: "Monitoria", href: "/dashboard/monitoria" },
+                  { name: "Resumos", href: "/dashboard/resumos" },
+                  { name: "Comunidade", href: "/dashboard/comunidade" },
+                ],
               },
               {
                 title: "Empresa",
-                links: ["Sobre nós", "Blog", "Imprensa", "Contato"],
+                links: [
+                  { name: "Sobre nós", href: "#" },
+                  { name: "Blog", href: "#" },
+                  { name: "Imprensa", href: "#" },
+                  { name: "Contato", href: "/contato" },
+                ],
               },
               {
                 title: "Suporte",
-                links: ["Central de Ajuda", "Status do Sistema", "Termos de Uso", "Privacidade", "Cookies"],
+                links: [
+                  { name: "Central de Ajuda", href: "#" },
+                  { name: "Status do Sistema", href: "#" },
+                  { name: "Termos de Uso", href: "#" },
+                  { name: "Privacidade", href: "#" },
+                  { name: "Cookies", href: "#" },
+                ],
               },
             ].map((col) => (
               <div key={col.title} className="space-y-4">
                 <h4 className="text-sm font-semibold text-white/80 uppercase tracking-wider">{col.title}</h4>
                 <ul className="space-y-2">
                   {col.links.map((link) => (
-                    <li key={link}>
-                      <a href="#" className="text-sm text-white/50 hover:text-white transition-colors">
-                        {link}
-                      </a>
+                    <li key={link.name}>
+                      <Link href={link.href} className="text-sm text-white/50 hover:text-white transition-colors">
+                        {link.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>

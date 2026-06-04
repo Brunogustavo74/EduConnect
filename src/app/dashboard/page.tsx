@@ -22,13 +22,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import {
-  proximasAtividades,
-  desempenhoBimestral,
-  dashboardStats,
-  citacoes,
-  metasSemanais,
-} from "@/lib/mock-data";
+import { useAtividades } from "@/hooks/useAtividades";
+import { useDesempenho } from "@/hooks/useDesempenho";
+import { citacoes } from "@/lib/mock-data";
+import Skeleton, { SkeletonStatCards } from "@/components/ui/Skeleton";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { Citacao } from "@/types";
 
 const container = {
   hidden: { opacity: 0 },
@@ -42,41 +42,6 @@ const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
-
-const statCards = [
-  {
-    label: "Próximas atividades",
-    value: dashboardStats.proximasAtividades,
-    sub: "esta semana",
-    icon: CalendarDays,
-    color: "text-info",
-    bgColor: "bg-info-light",
-  },
-  {
-    label: "Média geral",
-    value: dashboardStats.mediaGeral.toFixed(1).replace(".", ","),
-    sub: "Excelente! 🎉",
-    icon: TrendingUp,
-    color: "text-success",
-    bgColor: "bg-success-light",
-  },
-  {
-    label: "Monitorias",
-    value: dashboardStats.monitorias,
-    sub: "agendadas",
-    icon: Users,
-    color: "text-navy-institutional",
-    bgColor: "bg-blue-50",
-  },
-  {
-    label: "Conquistas",
-    value: dashboardStats.conquistas,
-    sub: "desbloqueadas",
-    icon: Trophy,
-    color: "text-gold-dark",
-    bgColor: "bg-amber-50",
-  },
-];
 
 const tipoBadge: Record<string, string> = {
   prova: "badge-prova",
@@ -107,8 +72,99 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export default function DashboardPage() {
+  const { atividades, loading: loadingAtividades } = useAtividades();
+  const {
+    desempenhoBimestral,
+    stats,
+    metas,
+    loading: loadingDesempenho,
+    toggleMetaSemanal,
+  } = useDesempenho();
 
-  const citacao = citacoes[Math.floor(Math.random() * citacoes.length)];
+  const [citacao, setCitacao] = useState<Citacao | null>(null);
+
+  useEffect(() => {
+    // Evita erro de hidratação escolhendo a citação apenas no client-side
+    setCitacao(citacoes[Math.floor(Math.random() * citacoes.length)]);
+  }, []);
+
+  const handleToggleMeta = async (id: string) => {
+    try {
+      await toggleMetaSemanal(id);
+    } catch (err) {
+      console.error("Erro ao marcar/desmarcar meta:", err);
+    }
+  };
+
+  const loading = loadingAtividades || loadingDesempenho || !stats;
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <SkeletonStatCards />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="card p-6 space-y-4 lg:col-span-1">
+            <Skeleton variant="text" width="60%" height={24} />
+            <div className="space-y-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton variant="circular" width={32} height={32} />
+                  <div className="flex-1 space-y-1">
+                    <Skeleton variant="text" width="80%" height={16} />
+                    <Skeleton variant="text" width="40%" height={12} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card p-6 space-y-4 lg:col-span-2">
+            <Skeleton variant="text" width="40%" height={24} />
+            <Skeleton variant="rectangular" height={200} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const statCards = [
+    {
+      label: "Próximas atividades",
+      value: stats.proximasAtividades,
+      sub: "esta semana",
+      icon: CalendarDays,
+      color: "text-info",
+      bgColor: "bg-info-light",
+    },
+    {
+      label: "Média geral",
+      value: stats.mediaGeral.toFixed(1).replace(".", ","),
+      sub: "Excelente! 🎉",
+      icon: TrendingUp,
+      color: "text-success",
+      bgColor: "bg-success-light",
+    },
+    {
+      label: "Monitorias",
+      value: stats.monitorias,
+      sub: "agendadas",
+      icon: Users,
+      color: "text-navy-institutional",
+      bgColor: "bg-blue-50",
+    },
+    {
+      label: "Conquistas",
+      value: stats.conquistas,
+      sub: "desbloqueadas",
+      icon: Trophy,
+      color: "text-gold-dark",
+      bgColor: "bg-amber-50",
+    },
+  ];
+
+  // Cálculos das metas semanais
+  const totalEstudado = metas.reduce((acc, m) => acc + m.horasEstudo, 0);
+  const totalMeta = metas.reduce((acc, m) => acc + m.horasMeta, 0);
+  const percentualMeta = totalMeta > 0 ? Math.round((totalEstudado / totalMeta) * 100) : 0;
 
   return (
     <motion.div
@@ -150,7 +206,7 @@ export default function DashboardPage() {
             <BookOpen className="w-4 h-4 text-gray-400" />
           </div>
           <div className="space-y-3">
-            {proximasAtividades.slice(0, 4).map((atividade, i) => (
+            {atividades.slice(0, 4).map((atividade, i) => (
               <motion.div
                 key={atividade.id}
                 initial={{ opacity: 0, x: -10 }}
@@ -175,10 +231,13 @@ export default function DashboardPage() {
               </motion.div>
             ))}
           </div>
-          <button className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1">
+          <Link
+            href="/dashboard/agenda"
+            className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1"
+          >
             Ver todas
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
 
         <motion.div variants={item} className="card p-6 lg:col-span-1">
@@ -232,10 +291,13 @@ export default function DashboardPage() {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <button className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1">
+          <Link
+            href="/dashboard/desempenho"
+            className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1"
+          >
             Ver relatório completo
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
 
         <motion.div
@@ -244,36 +306,44 @@ export default function DashboardPage() {
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-gold/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-          <div className="relative z-10">
-            <h2 className="text-lg font-semibold font-serif mb-4">
-              Foco de hoje
-            </h2>
-            <div className="mb-6">
-              <Quote className="w-5 h-5 text-gold mb-2" />
-              <p className="text-white/90 italic text-sm leading-relaxed">
-                &ldquo;{citacao.texto}&rdquo;
-              </p>
-              <p className="text-gold text-xs mt-2 font-medium">
-                — {citacao.autor}
-              </p>
+          <div className="relative z-10 flex flex-col h-full justify-between">
+            <div>
+              <h2 className="text-lg font-semibold font-serif mb-4">
+                Foco de hoje
+              </h2>
+              {citacao && (
+                <div className="mb-6 animate-fadeIn">
+                  <Quote className="w-5 h-5 text-gold mb-2" />
+                  <p className="text-white/90 italic text-sm leading-relaxed">
+                    &ldquo;{citacao.texto}&rdquo;
+                  </p>
+                  <p className="text-gold text-xs mt-2 font-medium">
+                    — {citacao.autor}
+                  </p>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2 border-t border-white/10 pt-4">
+            <div className="space-y-2 border-t border-white/10 pt-4 mt-auto">
               <p className="text-xs text-white/50 uppercase tracking-wide font-medium">
                 Metas do dia
               </p>
-              {metasSemanais.slice(0, 3).map((meta) => (
-                <div key={meta.id} className="flex items-center gap-2">
+              {metas.slice(0, 3).map((meta) => (
+                <div
+                  key={meta.id}
+                  onClick={() => handleToggleMeta(meta.id)}
+                  className="flex items-center gap-2 cursor-pointer group"
+                >
                   <CheckCircle2
-                    className={`w-4 h-4 flex-shrink-0 ${
-                      meta.concluida ? "text-gold" : "text-white/30"
+                    className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                      meta.concluida ? "text-gold" : "text-white/30 group-hover:text-white/60"
                     }`}
                   />
                   <span
-                    className={`text-sm ${
+                    className={`text-sm transition-all ${
                       meta.concluida
                         ? "text-white/50 line-through"
-                        : "text-white/80"
+                        : "text-white/80 group-hover:text-white"
                     }`}
                   >
                     {meta.titulo}
@@ -300,16 +370,16 @@ export default function DashboardPage() {
             <div>
               <p className="text-xs text-gray-500 mb-1">Meta semanal</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-gray-900">12</span>
-                <span className="text-sm text-gray-400">/ 15 horas</span>
+                <span className="text-3xl font-bold text-gray-900">{totalEstudado}</span>
+                <span className="text-sm text-gray-400">/ {totalMeta} horas</span>
               </div>
             </div>
             <div className="flex-1">
               <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: "80%" }}
-                  transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+                  animate={{ width: `${percentualMeta}%` }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
                   className="h-full rounded-full"
                   style={{
                     background:
@@ -317,26 +387,27 @@ export default function DashboardPage() {
                   }}
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">80% concluído</p>
+              <p className="text-xs text-gray-400 mt-1">{percentualMeta}% concluído</p>
             </div>
           </div>
           <div className="space-y-2">
-            {metasSemanais.map((meta) => (
+            {metas.map((meta) => (
               <div
                 key={meta.id}
-                className="flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => handleToggleMeta(meta.id)}
+                className="flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group"
               >
                 <div className="flex items-center gap-3">
                   <CheckCircle2
-                    className={`w-4.5 h-4.5 ${
-                      meta.concluida ? "text-success" : "text-gray-300"
+                    className={`w-4.5 h-4.5 transition-colors ${
+                      meta.concluida ? "text-success" : "text-gray-300 group-hover:text-gray-400"
                     }`}
                   />
                   <span
-                    className={`text-sm ${
+                    className={`text-sm transition-all ${
                       meta.concluida
                         ? "text-gray-400 line-through"
-                        : "text-gray-700"
+                        : "text-gray-700 group-hover:text-gray-900"
                     }`}
                   >
                     {meta.titulo}
@@ -348,10 +419,13 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
-          <button className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1">
+          <Link
+            href="/dashboard/estudos"
+            className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1"
+          >
             Ver plano completo
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
 
         <motion.div variants={item} className="card p-6">
@@ -360,12 +434,18 @@ export default function DashboardPage() {
               Monitoria
             </h2>
             <div className="flex gap-2">
-              <button className="text-xs px-3 py-1.5 bg-navy text-white rounded-lg font-medium hover:bg-navy-institutional transition-colors">
+              <Link
+                href="/dashboard/monitoria"
+                className="text-xs px-3 py-1.5 bg-navy text-white rounded-lg font-medium hover:bg-navy-institutional transition-colors"
+              >
                 Solicitar
-              </button>
-              <button className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+              </Link>
+              <Link
+                href="/dashboard/monitoria?filter=minhas"
+                className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              >
                 Minhas monitorias
-              </button>
+              </Link>
             </div>
           </div>
           <div className="space-y-3">
@@ -430,10 +510,13 @@ export default function DashboardPage() {
               </motion.div>
             ))}
           </div>
-          <button className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1">
+          <Link
+            href="/dashboard/monitoria"
+            className="mt-4 w-full text-center text-sm text-navy font-medium hover:text-navy-institutional transition-colors flex items-center justify-center gap-1"
+          >
             Ver todos os monitores
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
       </div>
     </motion.div>

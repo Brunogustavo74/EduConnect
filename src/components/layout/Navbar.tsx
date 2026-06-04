@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Bell, Menu, X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usuarioAtual, notificacoes as initialNotifications } from "@/lib/mock-data";
+import { useAuth } from "@/contexts/AuthContext";
+import { notificacoes as initialNotifications } from "@/lib/mock-data";
 import { getGreeting } from "@/lib/utils";
 
 interface NavbarProps {
@@ -11,6 +12,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onToggleSidebar }: NavbarProps) {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -43,7 +45,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
 
         <div className="hidden sm:block">
           <h1 className="text-lg font-bold text-gray-900 font-serif leading-tight">
-            {getGreeting()}, {usuarioAtual.nome.split(" ")[0]}!
+            {getGreeting()}, {user?.nome ? user.nome.split(" ")[0] : "Estudante"}!
           </h1>
           <p className="text-xs text-gray-400">Que bom ter você por aqui. 👋</p>
         </div>
@@ -130,11 +132,11 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
 
         <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
           <div className="text-right hidden md:block">
-            <p className="text-xs font-bold text-gray-900">{usuarioAtual.nome}</p>
-            <p className="text-[10px] text-gray-400 font-medium">{usuarioAtual.serie}</p>
+            <p className="text-xs font-bold text-gray-900">{user?.nome || "Estudante"}</p>
+            <p className="text-[10px] text-gray-400 font-medium">{user?.serie || ""}</p>
           </div>
           <div className="w-9 h-9 rounded-full bg-navy text-gold flex items-center justify-center font-bold text-sm shadow-sm select-none">
-            {getInitials(usuarioAtual.nome)}
+            {getInitials(user?.nome || "Estudante")}
           </div>
         </div>
       </div>

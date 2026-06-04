@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "EduConnect — Conectando alunos, conhecimento e oportunidades",
   description:
-    "Plataforma educacional completa para alunos e professores. Organize provas, trabalhos, planos de estudo, monitoria e muito mais.",
+    "Plataforma educacional completa para alunos e professores da ETE Cícero Dias. Organize provas, trabalhos, planos de estudo, monitoria e muito mais.",
   keywords: [
     "educação",
     "plataforma educacional",
@@ -28,8 +28,32 @@ export const metadata: Metadata = {
     "professores",
     "portal cd",
     "portal cicero dias",
+    "ETE Cícero Dias",
+    "EduConnect",
   ],
+  authors: [{ name: "EduConnect Team" }],
+  openGraph: {
+    title: "EduConnect — Conectando alunos, conhecimento e oportunidades",
+    description:
+      "Plataforma educacional completa para alunos e professores da ETE Cícero Dias. Organize provas, trabalhos, planos de estudo, monitoria e muito mais.",
+    url: "https://educonnect.nave.org.br",
+    siteName: "EduConnect",
+    locale: "pt-BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EduConnect — Conectando alunos, conhecimento e oportunidades",
+    description:
+      "Plataforma educacional completa para alunos e professores da ETE Cícero Dias.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
+
+import { Providers } from "@/components/Providers";
 
 export default function RootLayout({
   children,
@@ -41,7 +65,9 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
