@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = useCallback(async (_email: string, _password: string) => {
     setIsLoading(true);
     try {
-      // Simula autenticação — será substituído pelo Supabase Auth
+     
       await new Promise((r) => setTimeout(r, 800));
       setUser(mockUser);
     } finally {
