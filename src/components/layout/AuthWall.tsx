@@ -165,15 +165,23 @@ export default function AuthWall({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const formVariants = {
-    hidden: { opacity: 0, x: isLogin ? -30 : 30 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.06 },
+ const formVariants = {
+  hidden: { opacity: 0, x: isLogin ? -30 : 30 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1] as const,
+      staggerChildren: 0.06,
     },
-    exit: { opacity: 0, x: isLogin ? 30 : -30, transition: { duration: 0.25 } },
-  };
+  },
+  exit: {
+    opacity: 0,
+    x: isLogin ? 30 : -30,
+    transition: { duration: 0.25 },
+  },
+};
 
   const itemVariants = {
     hidden: { opacity: 0, y: 12 },
