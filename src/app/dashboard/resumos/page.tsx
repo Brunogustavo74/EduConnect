@@ -52,15 +52,12 @@ export default function ResumosPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("todos");
 
-  // Estado da visualização expandida
   const [activeMaterial, setActiveMaterial] = useState<Material | null>(null);
 
-  // Likes e Visualizações interativas locais
   const [likes, setLikes] = useState<Record<string, number>>({});
   const [likedList, setLikedList] = useState<Record<string, boolean>>({});
   const [views, setViews] = useState<Record<string, number>>({});
 
-  // Modal de Novo Material
   const [isNewOpen, setIsNewOpen] = useState(false);
   const [novoTitulo, setNovoTitulo] = useState("");
   const [novaDisciplina, setNovaDisciplina] = useState("Matemática");
@@ -86,7 +83,6 @@ export default function ResumosPage() {
   };
 
   const handleOpenPreview = (material: Material) => {
-    // Incrementa views
     const currentViews = getViews(material.id);
     setViews({ ...views, [material.id]: currentViews + 1 });
     setActiveMaterial(material);
@@ -160,7 +156,7 @@ export default function ResumosPage() {
       transition={{ duration: 0.4 }}
       className="space-y-6"
     >
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold font-serif text-gray-900">Biblioteca de Materiais</h1>
@@ -178,7 +174,7 @@ export default function ResumosPage() {
         </button>
       </div>
 
-      {/* Busca e Tipo Filtro */}
+      {}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:max-w-md">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
@@ -208,7 +204,7 @@ export default function ResumosPage() {
         </div>
       </div>
 
-      {/* Grid de Cards */}
+      {}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -324,7 +320,7 @@ export default function ResumosPage() {
         </div>
       )}
 
-      {/* Modal de Leitura Expandida */}
+      {}
       <Modal
         isOpen={activeMaterial !== null}
         onClose={() => setActiveMaterial(null)}
@@ -381,7 +377,7 @@ export default function ResumosPage() {
         )}
       </Modal>
 
-      {/* Modal de Criação de Material */}
+      {}
       <Modal
         isOpen={isNewOpen}
         onClose={() => setIsNewOpen(false)}

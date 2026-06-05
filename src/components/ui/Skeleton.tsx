@@ -43,7 +43,6 @@ export default function Skeleton({ className = "", variant = "text", width, heig
     );
   }
 
-  // Text variant with multiple lines
   if (lines > 1) {
     return (
       <div className={`space-y-2.5 ${className}`}>
@@ -61,7 +60,6 @@ export default function Skeleton({ className = "", variant = "text", width, heig
   return <SkeletonLine className={className} width={width} height={height} />;
 }
 
-// Pre-built skeleton patterns for common layouts
 export function SkeletonCard() {
   return (
     <div className="card p-5 space-y-3">

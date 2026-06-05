@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Share2, Edit3, Save } from "lucide-react";
 import { notasCaderno as initialNotes } from "@/lib/mock-data";
+import { useToast } from "@/contexts/ToastContext";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function CadernoPage() {
+  const { success, info } = useToast();
   const [notes, setNotes] = useState(initialNotes);
   const [selectedNote, setSelectedNote] = useState(initialNotes[0]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(selectedNote.titulo);
   const [editedContent, setEditedContent] = useState(selectedNote.conteudo);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleSelectNote = (note: typeof initialNotes[0]) => {
     setSelectedNote(note);
@@ -37,6 +46,7 @@ export default function CadernoPage() {
       conteudo: editedContent,
     });
     setIsEditing(false);
+    success("Anotação salva", "Suas alterações foram gravadas.");
   };
 
   const handleCreateNote = () => {
@@ -51,6 +61,12 @@ export default function CadernoPage() {
     setNotes([newNote, ...notes]);
     handleSelectNote(newNote);
     setIsEditing(true);
+    info("Nova anotação", "Escreva o título e conteúdo.");
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(`https://educonnect.app/caderno/${selectedNote.id}`).catch(() => {});
+    success("Link copiado!", "Compartilhe com seu grupo de estudos.");
   };
 
   return (
@@ -84,7 +100,13 @@ export default function CadernoPage() {
           </h2>
 
           <div className="space-y-2 max-h-[450px] overflow-y-auto pr-1">
-            {notes.map((note) => (
+            {isLoading ? (
+               <>
+                 <div className="p-3 border rounded-lg"><Skeleton variant="text" lines={2} /></div>
+                 <div className="p-3 border rounded-lg"><Skeleton variant="text" lines={2} /></div>
+                 <div className="p-3 border rounded-lg"><Skeleton variant="text" lines={2} /></div>
+               </>
+            ) : notes.map((note) => (
               <div
                 key={note.id}
                 onClick={() => handleSelectNote(note)}
@@ -135,8 +157,9 @@ export default function CadernoPage() {
                 </button>
               )}
               <button
+                onClick={handleShare}
                 title="Compartilhar nota"
-                className="p-2 text-gray-400 hover:text-navy hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-navy hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors cursor-pointer"
               >
                 <Share2 className="w-4 h-4" />
               </button>
@@ -144,7 +167,12 @@ export default function CadernoPage() {
           </div>
 
           <div className="space-y-4">
-            {isEditing ? (
+            {isLoading ? (
+               <>
+                 <Skeleton variant="text" width="60%" height={28} />
+                 <Skeleton variant="text" lines={6} />
+               </>
+            ) : isEditing ? (
               <input
                 type="text"
                 value={editedTitle}

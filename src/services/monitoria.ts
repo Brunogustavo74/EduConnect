@@ -1,26 +1,42 @@
-// ========================================
-// Serviço de Monitoria
-// ========================================
-
-import { monitores } from "@/lib/mock-data";
+import { supabase } from "@/lib/supabase";
 import type { Monitor } from "@/types";
 
 export async function getMonitores(): Promise<Monitor[]> {
-  await new Promise((r) => setTimeout(r, 300));
-  return monitores;
+  const { data, error } = await supabase
+    .from("monitors")
+    .select("*");
+
+  if (error || !data) return [];
+  return data as Monitor[];
 }
 
 export async function getMonitoresDisponiveis(): Promise<Monitor[]> {
-  await new Promise((r) => setTimeout(r, 300));
-  return monitores.filter((m) => m.disponivel);
+  const { data, error } = await supabase
+    .from("monitors")
+    .select("*")
+    .eq("disponivel", true);
+
+  if (error || !data) return [];
+  return data as Monitor[];
 }
 
 export async function getMonitorPorId(id: string): Promise<Monitor | undefined> {
-  await new Promise((r) => setTimeout(r, 200));
-  return monitores.find((m) => m.id === id);
+  const { data, error } = await supabase
+    .from("monitors")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return undefined;
+  return data as Monitor;
 }
 
 export async function getMonitoresPorDisciplina(disciplina: string): Promise<Monitor[]> {
-  await new Promise((r) => setTimeout(r, 200));
-  return monitores.filter((m) => m.disciplina === disciplina);
+  const { data, error } = await supabase
+    .from("monitors")
+    .select("*")
+    .eq("disciplina", disciplina);
+
+  if (error || !data) return [];
+  return data as Monitor[];
 }

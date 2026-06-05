@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import type { Usuario } from "@/types";
-import { usuarioAtual as mockUser } from "@/lib/mock-data";
+import { supabase } from "@/lib/supabase";
 
 interface AuthContextType {
   user: Usuario | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (nome: string, email: string, escola: string, serie: string) => Promise<void>;
+  signUp: (nome: string, email: string, password: string, escola: string, serie: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (data: Partial<Usuario>) => Promise<void>;
 }
@@ -18,32 +17,106 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<Usuario | null>(mockUser);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<Usuario | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const signIn = useCallback(async (_email: string, _password: string) => {
+  const fetchProfile = async (userId: string, email: string, retries = 3): Promise<void> => {
+    for (let attempt = 0; attempt < retries; attempt++) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (data) {
+        setUser({
+          id: data.id,
+          nome: data.nome,
+          email: email,
+          escola: data.escola || "",
+          serie: data.serie || "",
+          avatar: data.avatar || "",
+        });
+        return;
+      }
+
+      if (attempt < retries - 1) {
+        await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+      }
+    }
+
+    setUser({
+      id: userId,
+      nome: email.split("@")[0],
+      email: email,
+      escola: "",
+      serie: "",
+      avatar: "",
+    });
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user && mounted) {
+          await fetchProfile(session.user.id, session.user.email || "");
+        }
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
+      if (session?.user) {
+        await fetchProfile(session.user.id, session.user.email || "");
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => {
+      mounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const signIn = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
-     
-      await new Promise((r) => setTimeout(r, 800));
-      setUser(mockUser);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      if (data.user) {
+        await fetchProfile(data.user.id, email);
+      }
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const signUp = useCallback(async (nome: string, email: string, escola: string, serie: string) => {
+  const signUp = useCallback(async (nome: string, email: string, password: string, escola: string, serie: string) => {
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 800));
-      setUser({
-        id: String(Date.now()),
-        nome,
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
-        escola,
-        serie,
-        avatar: "",
+        password,
+        options: {
+          data: { nome, escola, serie }
+        }
       });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        await new Promise((r) => setTimeout(r, 1000));
+        await fetchProfile(authData.user.id, email);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 300));
+      await supabase.auth.signOut();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -60,14 +133,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateProfile = useCallback(async (data: Partial<Usuario>) => {
+    if (!user) return;
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 300));
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          nome: data.nome,
+          escola: data.escola,
+          serie: data.serie,
+          avatar: data.avatar,
+        })
+        .eq("id", user.id);
+
+      if (error) throw error;
       setUser((prev) => (prev ? { ...prev, ...data } : null));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   return (
     <AuthContext.Provider

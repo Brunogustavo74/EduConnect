@@ -291,7 +291,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div

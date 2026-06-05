@@ -1,6 +1,3 @@
-// ========================================
-// EduConnect — Tipos centralizados
-// ========================================
 
 export interface Usuario {
   id: string;

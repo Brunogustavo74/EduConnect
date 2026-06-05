@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/purity */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -84,7 +84,6 @@ export default function DashboardPage() {
   const [citacao, setCitacao] = useState<Citacao | null>(null);
 
   useEffect(() => {
-    // Evita erro de hidratação escolhendo a citação apenas no client-side
     setCitacao(citacoes[Math.floor(Math.random() * citacoes.length)]);
   }, []);
 
@@ -161,7 +160,6 @@ export default function DashboardPage() {
     },
   ];
 
-  // Cálculos das metas semanais
   const totalEstudado = metas.reduce((acc, m) => acc + m.horasEstudo, 0);
   const totalMeta = metas.reduce((acc, m) => acc + m.horasMeta, 0);
   const percentualMeta = totalMeta > 0 ? Math.round((totalEstudado / totalMeta) * 100) : 0;

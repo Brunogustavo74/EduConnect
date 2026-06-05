@@ -34,7 +34,6 @@ export default function EmptyState({
   );
 }
 
-// Pre-built empty states for common scenarios
 export function EmptyAgenda() {
   return (
     <EmptyState

@@ -60,18 +60,15 @@ export default function MateriaisPage() {
   const [disciplinaFiltro, setDisciplinaFiltro] = useState("Todas");
   const [tipoFiltro, setTipoFiltro] = useState("Todos");
 
-  // Estados dos Modais
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Campos do Formulário
   const [novoTitulo, setNovoTitulo] = useState("");
   const [novaDisciplina, setNovaDisciplina] = useState("Matemática");
   const [novoTipo, setNovoTipo] = useState<Material["tipo"]>("pdf");
   const [novoAutor, setNovoAutor] = useState(user?.nome || "Estudante");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Filtragem dos materiais
   const materiaisFiltrados = materiais.filter((m) => {
     const bateBusca = m.titulo.toLowerCase().includes(busca.toLowerCase()) ||
                      m.autor.toLowerCase().includes(busca.toLowerCase());
@@ -81,13 +78,11 @@ export default function MateriaisPage() {
   });
 
   const handleDownload = (material: Material) => {
-    // Simula download
     addToast({
       type: "success",
       title: "Download Iniciado!",
       message: `Baixando "${material.titulo}" de ${material.autor}...`,
     });
-    // Incrementa downloads localmente (apenas para efeito visual, já que o mock é dinâmico em memória)
     material.downloads += 1;
   };
 
@@ -130,7 +125,6 @@ export default function MateriaisPage() {
         message: `"${novoTitulo}" já está disponível para estudo.`,
       });
 
-      // Reseta e fecha modal
       setNovoTitulo("");
       setIsUploadOpen(false);
     } catch (err) {
@@ -151,7 +145,7 @@ export default function MateriaisPage() {
       transition={{ duration: 0.4 }}
       className="space-y-6"
     >
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold font-serif text-gray-900">Biblioteca de Materiais</h1>
@@ -172,7 +166,7 @@ export default function MateriaisPage() {
         </button>
       </div>
 
-      {/* Filtros e Busca */}
+      {}
       <div className="card p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
         <div className="relative md:col-span-2">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -214,7 +208,7 @@ export default function MateriaisPage() {
         </select>
       </div>
 
-      {/* Grid de Materiais */}
+      {}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -310,7 +304,7 @@ export default function MateriaisPage() {
         </div>
       )}
 
-      {/* Modal de Envio */}
+      {}
       <Modal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
@@ -408,7 +402,7 @@ export default function MateriaisPage() {
         </form>
       </Modal>
 
-      {/* Confirm Deletion */}
+      {}
       <ConfirmDialog
         isOpen={deletingId !== null}
         onClose={() => setDeletingId(null)}

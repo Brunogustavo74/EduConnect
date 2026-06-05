@@ -24,30 +24,24 @@ export default function ConfiguracoesPage() {
 
   const [activeTab, setActiveTab] = useState<TabType>("perfil");
 
-  // Perfil State
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
 
-  // Escolaridade State
   const [escola, setEscola] = useState("");
   const [serie, setSerie] = useState("");
 
-  // Notificações State
   const [notifProvas, setNotifProvas] = useState(true);
   const [notifTrabalhos, setNotifTrabalhos] = useState(true);
   const [notifMonitorias, setNotifMonitorias] = useState(true);
   const [notifMateriais, setNotifMateriais] = useState(false);
 
-  // Segurança State
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
 
-  // Modais e Loaders
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // Inicializa dados do usuário
   useEffect(() => {
     if (user) {
       setNome(user.nome);
@@ -172,7 +166,7 @@ export default function ConfiguracoesPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        {/* Sidebar de Abas */}
+        {}
         <div className="card p-3 lg:col-span-1 space-y-1 bg-white">
           <button
             onClick={() => setActiveTab("perfil")}
@@ -220,7 +214,7 @@ export default function ConfiguracoesPage() {
           </button>
         </div>
 
-        {/* Formulários das Abas */}
+        {}
         <div className="lg:col-span-3 space-y-6">
           {activeTab === "perfil" && (
             <div className="card p-6 space-y-6 bg-white">
@@ -385,7 +379,7 @@ export default function ConfiguracoesPage() {
                 </button>
               </form>
 
-              {/* Zona de Perigo */}
+              {}
               <div className="border-t border-red-100 pt-6 mt-6">
                 <h3 className="text-sm font-bold text-error uppercase tracking-wider mb-2">Zona de Perigo</h3>
                 <p className="text-xs text-gray-400 mb-4">
@@ -445,7 +439,7 @@ export default function ConfiguracoesPage() {
         </div>
       </div>
 
-      {/* Confirmação de Exclusão de Conta */}
+      {}
       <ConfirmDialog
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}

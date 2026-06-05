@@ -15,7 +15,6 @@ import type {
   Usuario,
 } from "@/types";
 
-// Re-export types for backward compatibility
 export type {
   Atividade,
   Disciplina,

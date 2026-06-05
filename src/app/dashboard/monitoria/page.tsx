@@ -4,12 +4,43 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Star, MessageSquare, CheckCircle } from "lucide-react";
 import { monitores } from "@/lib/mock-data";
+import { useToast } from "@/contexts/ToastContext";
+import Skeleton, { SkeletonListItem } from "@/components/ui/Skeleton";
+import { useEffect } from "react";
 
 export default function MonitoriaPage() {
+  const { success } = useToast();
   const [activeTab, setActiveTab] = useState<"solicitar" | "minhas">("solicitar");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMonitor, setSelectedMonitor] = useState<typeof monitores[0] | null>(null);
   const [sessionRequested, setSessionRequested] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const [minhasMonitorias, setMinhasMonitorias] = useState([
+    {
+      id: "1",
+      monitor: "João Pedro",
+      materia: "Física",
+      data: "05/06/2026",
+      horario: "14:00",
+      status: "confirmada",
+    },
+    {
+      id: "2",
+      monitor: "Maria Eduarda",
+      materia: "Matemática",
+      data: "07/06/2026",
+      horario: "10:30",
+      status: "aguardando",
+    },
+  ]);
+
+  const [duvida, setDuvida] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(t);
+  }, []);
 
   const filteredMonitors = monitores.filter((m) => {
     const query = searchQuery.toLowerCase();
@@ -30,10 +61,28 @@ export default function MonitoriaPage() {
   const handleRequestSession = (e: React.FormEvent) => {
     e.preventDefault();
     setSessionRequested(true);
+    
+    if (selectedMonitor) {
+      setMinhasMonitorias((prev) => [
+        ...prev,
+        {
+          id: String(Date.now()),
+          monitor: selectedMonitor.nome,
+          materia: selectedMonitor.disciplina,
+          data: new Date().toLocaleDateString("pt-BR"),
+          horario: "A definir",
+          status: "aguardando",
+        }
+      ]);
+    }
+    
     setTimeout(() => {
       setSessionRequested(false);
       setSelectedMonitor(null);
-    }, 3000);
+      setDuvida("");
+      success("Solicitação enviada!", "O monitor foi notificado. Acompanhe em 'Minhas Monitorias'.");
+      setActiveTab("minhas");
+    }, 1500);
   };
 
   return (
@@ -98,7 +147,14 @@ export default function MonitoriaPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredMonitors.map((m) => (
+              {isLoading ? (
+                <>
+                  <Skeleton variant="rectangular" height={176} />
+                  <Skeleton variant="rectangular" height={176} />
+                  <Skeleton variant="rectangular" height={176} />
+                  <Skeleton variant="rectangular" height={176} />
+                </>
+              ) : filteredMonitors.map((m) => (
                 <div
                   key={m.id}
                   onClick={() => setSelectedMonitor(m)}
@@ -186,6 +242,8 @@ export default function MonitoriaPage() {
                       </label>
                       <textarea
                         required
+                        value={duvida}
+                        onChange={(e) => setDuvida(e.target.value)}
                         placeholder="Escreva brevemente o assunto que deseja estudar..."
                         rows={3}
                         className="w-full text-xs p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-navy"
@@ -213,24 +271,12 @@ export default function MonitoriaPage() {
           </div>
 
           <div className="space-y-3">
-            {[
-              {
-                id: "1",
-                monitor: "João Pedro",
-                materia: "Física",
-                data: "05/06/2026",
-                horario: "14:00",
-                status: "confirmada",
-              },
-              {
-                id: "2",
-                monitor: "Maria Eduarda",
-                materia: "Matemática",
-                data: "07/06/2026",
-                horario: "10:30",
-                status: "aguardando",
-              },
-            ].map((mon) => (
+            {isLoading ? (
+               <>
+                 <SkeletonListItem />
+                 <SkeletonListItem />
+               </>
+            ) : minhasMonitorias.map((mon) => (
               <div
                 key={mon.id}
                 className="p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50/50"
@@ -252,7 +298,10 @@ export default function MonitoriaPage() {
                   >
                     {mon.status === "confirmada" ? "Confirmada" : "Pendente"}
                   </span>
-                  <button className="text-xs btn btn-secondary px-3 py-1">Cancelar</button>
+                  <button className="text-xs btn btn-secondary px-3 py-1" onClick={() => {
+                     setMinhasMonitorias(prev => prev.filter(m => m.id !== mon.id));
+                     success("Cancelada", "A monitoria foi cancelada.");
+                  }}>Cancelar</button>
                 </div>
               </div>
             ))}

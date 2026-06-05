@@ -29,7 +29,6 @@ export default function Modal({
   size = "md",
   footer,
 }: ModalProps) {
-  // Close on Escape key
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -48,7 +47,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -58,7 +57,7 @@ export default function Modal({
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
 
-          {/* Modal */}
+          {}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -67,7 +66,7 @@ export default function Modal({
               transition={{ duration: 0.2, ease: "easeOut" }}
               className={`${sizeClasses[size]} w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden`}
             >
-              {/* Header */}
+              {}
               <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100">
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 font-serif">{title}</h2>
@@ -84,12 +83,12 @@ export default function Modal({
                 </button>
               </div>
 
-              {/* Body */}
+              {}
               <div className="px-6 py-5 max-h-[60vh] overflow-y-auto">
                 {children}
               </div>
 
-              {/* Footer */}
+              {}
               {footer && (
                 <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-end gap-3">
                   {footer}
